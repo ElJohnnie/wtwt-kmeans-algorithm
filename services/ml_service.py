@@ -5,8 +5,11 @@ class MLService:
         self.engine = MLEngine()
     
     def validate_data(self, data):
+        if not data:
+            return False, "O body da requisição está vazio."
+
         required_fields = ['mood', 'primaryGenre', 'secondaryGenre', 'epoch']
-        moods = ['Feliz', 'Triste', 'Ansioso', 'Animado', 'Entediado']
+        moods = ['happy', 'sad', 'anxious', 'excited', 'bored']
         genres = ['Action', 'Animation', 'Comedy', 'Drama', 'Fantasy', 'Sci-fi', 'Thriller', 'Horror']
 
         for field in required_fields:
@@ -27,7 +30,7 @@ class MLService:
     def process_data(self, data):
         is_valid, message = self.validate_data(data)
         if not is_valid:
-            return {"message": message, "data": None}, 400  # Retorna mensagem de erro e status HTTP 400
+            return {"message": message, "data": None}, 400
 
         mood = data.get('mood')
         primary_genre = data.get('primaryGenre')
