@@ -10,7 +10,7 @@ class MLService:
 
         required_fields = ['mood', 'primaryGenre', 'secondaryGenre', 'epoch']
         moods = ['happy', 'sad', 'anxious', 'excited', 'bored']
-        genres = ['Action', 'Animation', 'Comedy', 'Drama', 'Fantasy', 'Sci-fi', 'Thriller', 'Horror']
+        genres = ['Action', 'Animation', 'Comedy', 'Drama', 'Fantasy', 'SciFi', 'Thriller', 'Horror', 'Adventure']
 
         for field in required_fields:
             if field not in data:

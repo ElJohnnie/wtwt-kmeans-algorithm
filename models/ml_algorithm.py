@@ -19,7 +19,7 @@ class MLEngine:
 
     def _train_model(self):
         features = self.genres.columns.tolist() + ['year']
-        self.kmeans = KMeans(n_clusters=10, random_state=42)
+        self.kmeans = KMeans(n_clusters=50)
         self.df['cluster'] = self.kmeans.fit_predict(self.df[features])
 
     def predict(self, mood, primary_genre, secondary_genre, decade):
