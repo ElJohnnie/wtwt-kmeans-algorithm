@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  ml:
+    build: '.'
+    container_name: what-to-watch-tonight_ml
+    image: what-to-watch-tonight_ml
+    working_dir: /app
+    expose:
+      - 5050
+    networks:
+      - wtwt
+
+networks:
+    wtwt:
+        name: wtwt
+        driver: bridge
