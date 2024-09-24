@@ -22,7 +22,7 @@ class MLEngine:
     def _train_model(self):
         # Treina o modelo KMeans usando os gêneros e o ano como características.
         features = self.genres.columns.tolist() + ['year']
-        self.kmeans = KMeans(n_clusters=100)
+        self.kmeans = KMeans(n_clusters=100, random_state=42)
         self.df['cluster'] = self.kmeans.fit_predict(self.df[features])
 
     def predict(self, mood, primary_genre, secondary_genre, decade):
@@ -33,7 +33,7 @@ class MLEngine:
             'sad': ['Fantasy', 'Thriller', 'Animation', 'Comedy'],
             'anxious': ['Thriller', 'Horror', 'SciFi', 'Action'],
             'excited': ['Action', 'SciFi', 'Adventure', 'Horror', 'Thriller'],
-            'bored': ['Comedy', 'Animation', 'Fantasy', 'Adventure']
+            'bored': ['Comedy', 'Animation', 'Fantasy', 'Adventure', 'Horror']
         }
 
         # Definir intervalo de anos
@@ -60,7 +60,7 @@ class MLEngine:
         # Filtrar filmes recomendados
         recommended_movies = self.df[
                 (self.df['cluster'].isin([primary_cluster, secondary_cluster])) & 
-                (self.df[mood_to_genre[mood]].sum(axis=1) > 0)  # Verifica se algum dos gêneros está presente
+                (self.df[mood_to_genre[mood]].sum(axis=1) > 0)
 ]
         
         # Retornar filmes recomendados
