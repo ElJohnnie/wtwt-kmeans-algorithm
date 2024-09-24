@@ -26,8 +26,10 @@ class MLEngine:
         self.kmeans = KMeans(n_clusters=500, random_state=5)
         self.df['cluster'] = self.kmeans.fit_predict(self.df[features])
 
-    def predict(self, mood, primary_genre, secondary_genre, decade):
+    def predict(self, mood, primary_genre, secondary_genre, decade, top_n_clusters=5):
         # Realiza a predição de filmes baseados no humor, gêneros primário e secundário, e década.
+        # O parâmetro top_n_clusters define quantos clusters devem ser considerados.
+
         # Mapeamento de humor para gênero
         mood_to_genre = {
             'happy': ['Comedy', 'Animation', 'Horror', 'Adventure', 'Action'],
@@ -47,23 +49,29 @@ class MLEngine:
         if filtered_df.empty:
             return {"message": "Não há dados disponíveis para a década especificada."}
         
-        # Encontrar os clusters primário e secundário mais frequentes
-        primary_cluster = filtered_df[(filtered_df[primary_genre] == 1)].groupby('cluster').size()
-        secondary_cluster = filtered_df[(filtered_df[secondary_genre] == 1)].groupby('cluster').size()
+        # Encontrar os n clusters mais frequentes para o gênero primário
+        primary_cluster_counts = filtered_df[filtered_df[primary_genre] == 1].groupby('cluster').size()
+        primary_clusters = primary_cluster_counts.nlargest(top_n_clusters).index.tolist()
         
-        if primary_cluster.empty or secondary_cluster.empty:
+        # Encontrar os n clusters mais frequentes para o gênero secundário
+        secondary_cluster_counts = filtered_df[filtered_df[secondary_genre] == 1].groupby('cluster').size()
+        secondary_clusters = secondary_cluster_counts.nlargest(top_n_clusters).index.tolist()
+        
+        # Combinar os clusters primários e secundários
+        selected_clusters = list(set(primary_clusters + secondary_clusters))
+        
+        if not selected_clusters:
             return {"message": "Não há dados disponíveis para os gêneros favoritos fornecidos na década especificada."}
         
-        # Selecionar os clusters mais frequentes
-        primary_cluster = primary_cluster.idxmax()
-        secondary_cluster = secondary_cluster.idxmax()
-        
-        # Filtrar filmes recomendados
+        # Filtrar filmes recomendados com base nos clusters selecionados
         recommended_movies = self.df[
-                (self.df['cluster'].isin([primary_cluster, secondary_cluster])) & 
-                (self.df[mood_to_genre[mood]].sum(axis=1) > 0)
+            (self.df['cluster'].isin(selected_clusters)) & 
+            (self.df[mood_to_genre[mood]].sum(axis=1) > 0)
         ]
         
+        if recommended_movies.empty:
+            return {"message": "Nenhum filme encontrado para a combinação fornecida."}
+
         # Adicionar aleatoriedade à seleção dos filmes recomendados
         recommended_movies = recommended_movies.sample(frac=1, random_state=np.random.randint(0, 1000))
 
