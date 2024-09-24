@@ -29,11 +29,11 @@ class MLEngine:
         # Realiza a predição de filmes baseados no humor, gêneros primário e secundário, e década.
         # Mapeamento de humor para gênero
         mood_to_genre = {
-            'happy': 'Comedy',
-            'sad': 'Drama',
-            'anxious': 'Thriller',
-            'excited': 'Action',
-            'bored': 'Adventure'
+            'happy': ['Comedy', 'Animation', 'Horror', 'Adventure', 'Action'],
+            'sad': ['Fantasy', 'Thriller', 'Animation', 'Comedy'],
+            'anxious': ['Thriller', 'Horror', 'SciFi', 'Action'],
+            'excited': ['Action', 'SciFi', 'Adventure', 'Horror', 'Thriller'],
+            'bored': ['Comedy', 'Animation', 'Fantasy', 'Adventure']
         }
 
         # Definir intervalo de anos
@@ -58,8 +58,10 @@ class MLEngine:
         secondary_cluster = secondary_cluster.idxmax()
         
         # Filtrar filmes recomendados
-        recommended_movies = self.df[(self.df['cluster'].isin([primary_cluster, secondary_cluster])) & 
-                                     (self.df[mood_to_genre[mood]] == 1)]
+        recommended_movies = self.df[
+                (self.df['cluster'].isin([primary_cluster, secondary_cluster])) & 
+                (self.df[mood_to_genre[mood]].sum(axis=1) > 0)  # Verifica se algum dos gêneros está presente
+]
         
         # Retornar filmes recomendados
         return {
