@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.cluster import KMeans
+import numpy as np
 
 class MLEngine:
     def __init__(self, csv_path='data/v1.csv'):
@@ -22,7 +23,7 @@ class MLEngine:
     def _train_model(self):
         # Treina o modelo KMeans usando os gêneros e o ano como características.
         features = self.genres.columns.tolist() + ['year']
-        self.kmeans = KMeans(n_clusters=100, random_state=42)
+        self.kmeans = KMeans(n_clusters=500, random_state=5)
         self.df['cluster'] = self.kmeans.fit_predict(self.df[features])
 
     def predict(self, mood, primary_genre, secondary_genre, decade):
@@ -33,7 +34,7 @@ class MLEngine:
             'sad': ['Fantasy', 'Thriller', 'Animation', 'Comedy'],
             'anxious': ['Thriller', 'Horror', 'SciFi', 'Action'],
             'excited': ['Action', 'SciFi', 'Adventure', 'Horror', 'Thriller'],
-            'bored': ['Comedy', 'Animation', 'Fantasy', 'Adventure', 'Horror']
+            'bored': ['Comedy', 'Fantasy', 'Adventure', 'Horror']
         }
 
         # Definir intervalo de anos
@@ -61,8 +62,11 @@ class MLEngine:
         recommended_movies = self.df[
                 (self.df['cluster'].isin([primary_cluster, secondary_cluster])) & 
                 (self.df[mood_to_genre[mood]].sum(axis=1) > 0)
-]
+        ]
         
+        # Adicionar aleatoriedade à seleção dos filmes recomendados
+        recommended_movies = recommended_movies.sample(frac=1, random_state=np.random.randint(0, 1000))
+
         # Retornar filmes recomendados
         return {
             "message": "Predição realizada com sucesso!",
