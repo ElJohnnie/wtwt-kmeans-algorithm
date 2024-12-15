@@ -1,0 +1,1 @@
+python3 utils/clean_data_set.py

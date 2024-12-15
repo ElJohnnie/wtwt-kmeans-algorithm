@@ -3,7 +3,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.cluster import KMeans
 
 class MLEngine:
-    def __init__(self, csv_path='data/v1.csv'):
+    def __init__(self, csv_path='data/v3.csv'):
         self.df = pd.read_csv(csv_path)
         self._preprocess_data()
         self._train_model()
