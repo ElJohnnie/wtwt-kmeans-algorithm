@@ -1,8 +1,17 @@
 from flask import Flask
-from routes import setup_routes
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
-setup_routes(app)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default_secret')
+
+@app.route('/')
+def home():
+    return f"Environment: {os.getenv('FLASK_ENV', 'unknown')}"
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5050)
+    debug = os.getenv('DEBUG', 'False') == 'True'
+    port = int(os.getenv('PORT', 5000))
+    app.run(debug=debug, port=port)

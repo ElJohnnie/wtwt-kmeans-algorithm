@@ -1,17 +1,17 @@
-version: "3"
+version: "3.8"
 
 services:
-  ml:
-    build: '.'
-    container_name: what-to-watch-tonight_ml
-    image: what-to-watch-tonight_ml
+  app:
+    build: .
+    container_name: what-to-watch-app
     working_dir: /app
-    expose:
-      - 5050
+    ports:
+      - "${PORT:-5050}:${PORT:-5050}"
+    env_file:
+      - .env.prod
     networks:
       - wtwt
 
 networks:
-    wtwt:
-        name: wtwt
-        driver: bridge
+  wtwt:
+    driver: bridge
