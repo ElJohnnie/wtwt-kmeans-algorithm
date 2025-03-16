@@ -1,6 +1,6 @@
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.cluster import KMeans
+import random
 
 class MLEngine:
     def __init__(self, csv_path='data/v3.csv'):
@@ -47,24 +47,28 @@ class MLEngine:
             return {"message": "Não há dados disponíveis para a década especificada."}
         
         # Encontrar os clusters primário e secundário mais frequentes
-        primary_cluster = filtered_df[(filtered_df[primary_genre] == 1)].groupby('cluster').size()
-        secondary_cluster = filtered_df[(filtered_df[secondary_genre] == 1)].groupby('cluster').size()
+        primary_clusters = filtered_df[filtered_df[primary_genre] == 1].groupby('cluster').size()
+        secondary_clusters = filtered_df[filtered_df[secondary_genre] == 1].groupby('cluster').size()
         
-        if primary_cluster.empty or secondary_cluster.empty:
+        if primary_clusters.empty or secondary_clusters.empty:
             return {"message": "Não há dados disponíveis para os gêneros favoritos fornecidos na década especificada."}
         
         # Selecionar os clusters mais frequentes
-        primary_cluster = primary_cluster.idxmax()
-        secondary_cluster = secondary_cluster.idxmax()
+        primary_cluster = primary_clusters.idxmax()
+        secondary_cluster = secondary_clusters.idxmax()
         
         # Filtrar filmes recomendados
         recommended_movies = self.df[
-                (self.df['cluster'].isin([primary_cluster, secondary_cluster])) & 
-                (self.df[mood_to_genre[mood]].sum(axis=1) > 0)
-]
+            (self.df['cluster'].isin([primary_cluster, secondary_cluster])) & 
+            (self.df[mood_to_genre[mood]].sum(axis=1) > 0)
+        ]
+        
+        # Randomizar a ordem dos filmes recomendados
+        recommended_movies = recommended_movies.sample(frac=1).reset_index(drop=True)
         
         # Retornar filmes recomendados
         return {
             "message": "Predição realizada com sucesso!",
             "data": recommended_movies[['title', 'genres']].to_dict(orient='records')
         }
+        

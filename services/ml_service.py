@@ -1,4 +1,4 @@
-from models.ml_algorithm import MLEngine
+from algorithm.ml_algorithm import MLEngine
 
 class MLService:
     def __init__(self):
