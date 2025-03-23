@@ -7,20 +7,19 @@ class MLEngine:
         self.df = pd.read_csv(csv_path)
         self._preprocess_data()
         self._train_model()
-        self.cache = {} 
+        self.cache = {}
 
     def _preprocess_data(self):
         self.df['year'] = self.df['title'].str.extract(r'\((\d{4})\)')
         self.df['year'] = pd.to_numeric(self.df['year'], errors='coerce')
         self.df = self.df.dropna(subset=['year'])
         self.df['year'] = self.df['year'].astype(int)
-
         self.genres = self.df['genres'].str.get_dummies(sep='|')
         self.df = self.df.join(self.genres)
 
     def _train_model(self):
         features = self.genres.columns.tolist() + ['year']
-        self.kmeans = KMeans(n_clusters=100, random_state=42)
+        self.kmeans = KMeans(n_clusters=50, random_state=10)
         self.df['cluster'] = self.kmeans.fit_predict(self.df[features])
 
     def predict(self, mood, primary_genre, secondary_genre, decade):
@@ -31,7 +30,7 @@ class MLEngine:
         mood_to_genre = {
             'happy': ['Comedy', 'Animation', 'Horror', 'Adventure', 'Action'],
             'sad': ['Fantasy', 'Thriller', 'Animation', 'Comedy'],
-            'anxious': ['Thriller', 'Horror', 'SciFi', 'Action'],
+            'anxious': ['Horror', 'SciFi', 'Action', 'Comedy', 'Fantasy', 'Adventure'],
             'excited': ['Action', 'SciFi', 'Adventure', 'Horror', 'Thriller'],
             'bored': ['Comedy', 'Animation', 'Fantasy', 'Adventure', 'Horror']
         }
@@ -39,7 +38,7 @@ class MLEngine:
         start_year = decade
         end_year = start_year + 10
 
-        filtered_df = self.df[(self.df['year'] >= start_year) & (self.df['year'] <= end_year)]
+        filtered_df = self.df[(self.df['year'] >= start_year) & (self.df['year'] < end_year)]
         
         if filtered_df.empty:
             return {"message": "Não há dados disponíveis para a década especificada."}
