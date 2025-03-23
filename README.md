@@ -1,1 +1,1 @@
-# wtwt-ml-model
+# wtwt-knn-algorithm
