@@ -19,14 +19,10 @@ class MLEngine:
 
     def _train_model(self):
         features = self.genres.columns.tolist() + ['year']
-        self.kmeans = KMeans(n_clusters=50, random_state=10)
+        self.kmeans = KMeans(n_clusters=120, random_state=38, n_init=10, max_iter=300)
         self.df['cluster'] = self.kmeans.fit_predict(self.df[features])
 
     def predict(self, mood, primary_genre, secondary_genre, decade):
-        cache_key = (mood, primary_genre, secondary_genre, decade)
-        if cache_key in self.cache:
-            return self.cache[cache_key]
-
         mood_to_genre = {
             'happy': ['Comedy', 'Animation', 'Horror', 'Adventure', 'Action'],
             'sad': ['Fantasy', 'Thriller', 'Animation', 'Comedy'],
@@ -64,6 +60,4 @@ class MLEngine:
             "data": recommended_movies[['title', 'genres']].to_dict(orient='records')
         }
 
-        self.cache[cache_key] = result
-        
         return result
