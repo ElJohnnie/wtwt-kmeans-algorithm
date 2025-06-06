@@ -2,7 +2,7 @@ Flask==1.1.2
 werkzeug==1.0.1
 jinja2==3.0.0
 itsdangerous==1.1.0
-pandas==2.3.0
-scikit-learn==1.7.0
-numpy==2.2.6
+pandas==1.4.2
+scikit-learn==1.0.2
+numpy==1.22.3
 python-dotenv==0.20.0
