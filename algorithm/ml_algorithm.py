@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.cluster import KMeans
-import random
+from concurrent.futures import ThreadPoolExecutor
 
 class MLEngine:
     def __init__(self, csv_path='data/v3.csv'):
@@ -38,9 +38,15 @@ class MLEngine:
         
         if filtered_df.empty:
             return {"message": "Não há dados disponíveis para a década especificada."}
-        
-        primary_clusters = filtered_df[filtered_df[primary_genre] == 1].groupby('cluster').size()
-        secondary_clusters = filtered_df[filtered_df[secondary_genre] == 1].groupby('cluster').size()
+
+        def get_clusters(genre):
+            return filtered_df[filtered_df[genre] == 1].groupby('cluster').size()
+
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            future_primary = executor.submit(get_clusters, primary_genre)
+            future_secondary = executor.submit(get_clusters, secondary_genre)
+            primary_clusters = future_primary.result()
+            secondary_clusters = future_secondary.result()
         
         if primary_clusters.empty or secondary_clusters.empty:
             return {"message": "Não há dados disponíveis para os gêneros favoritos fornecidos na década especificada."}
