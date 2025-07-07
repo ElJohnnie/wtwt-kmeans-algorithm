@@ -1,1 +1,1 @@
-# wtwt-knn-algorithm
+# wtwt-kmeans-algorithm
